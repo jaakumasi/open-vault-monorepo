@@ -1,10 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { SocialLoginProvider } from "./social-login-provider.entity";
 import { Otp } from "./otp.entity";
-import { Book } from "./book.entity";
-
-export type UserRole = "user" | "superUser"
-
+import { Book, UserRole } from "./book.entity";
 
 @Entity()
 export class User {
@@ -15,7 +12,7 @@ export class User {
     email: string;
 
     @Column({ type: "varchar", length: 100, nullable: true })
-    password: string;
+    password?: string;
 
     @OneToOne(
         () => SocialLoginProvider,
@@ -23,14 +20,14 @@ export class User {
         { nullable: true, onDelete: 'SET NULL' }
     )
     @JoinColumn()
-    socialLoginProvider: SocialLoginProvider
+    socialLoginProvider?: SocialLoginProvider
 
     @OneToOne(() => Otp, (otp) => otp.user, {
         nullable: true,
         onDelete: 'SET NULL'
     })
     @JoinColumn()
-    otp: Otp
+    otp?: Otp
 
     @Column({ type: "bool", default: false })
     otpVerified: boolean
