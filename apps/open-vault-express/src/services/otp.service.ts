@@ -61,7 +61,6 @@ export const findOtpByAssociatedMail = async (email: string) => {
 export const verifyOtpCode = async (body: VerifyOtpDto, res: Response) => {
     const { email, otp, verificationScenario } = body;
 
-    console.log(body)
     try {
         const user = await findUserByEmail(email, res);
 
