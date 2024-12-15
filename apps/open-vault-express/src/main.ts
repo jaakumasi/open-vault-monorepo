@@ -1,16 +1,18 @@
 import express, { response } from 'express';
 import cors from 'cors';
 import formidable from 'formidable';
-import { readFileBuffer } from './shared/utils/file-utils';
-import { S3Service } from './services/utils/s3.service';
+import { readFileBuffer } from './shared/utils/file';
+import { S3Service } from './services/s3.service';
 import { promises as fs } from 'fs';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { env } from './config/env';
-import { s3Client } from './services/utils/s3-client.service';
-import { PdfService } from './services/utils/pdf.service';
+import { PdfService } from './services/pdf.service';
 import path from 'path';
 import "reflect-metadata";
 import dataSource from './db/data-source';
+import authRouter from './controllers/auth.controller';
+import { verifyJWT } from './middlewares/auth';
+import { logger } from './shared/utils/logger.util';
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -48,13 +50,13 @@ app.delete('/pdf', async (req, res) => {
   }
   const command = new DeleteObjectCommand(params)
 
-  try {
-    await s3Client.send(command);
-    res.json({ message: 'File deleted successfully' });
-  } catch (error) {
-    console.log(error.message)
-    res.status(500).send('Error deleting file');
-  }
+  // try {
+  //   await s3Client.send(command);
+  //   res.json({ message: 'File deleted successfully' });
+  // } catch (error) {
+  //   console.log(error.message)
+  //   res.status(500).send('Error deleting file');
+  // }
 })
 
 app.post('/upload-file', async (req, res, next) => {
@@ -105,6 +107,12 @@ app.post('/upload-file', async (req, res, next) => {
   }
 })
 
+app.use('/api/v1/auth', authRouter);
+
+/* JWT Auth middleware for routes requiring authorization */
+app.use(verifyJWT)
+
+
 app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+  logger(`listening on port ${port}`);
 });

@@ -9,8 +9,8 @@ export class Otp {
     @Column({ type: "varchar", length: 150, unique: true })
     email: string;
 
-    @Column({ type: "varchar", length: 10, nullable: true })
-    code: string;
+    @Column({ type: "text", nullable: true })
+    code?: string;
 
     @OneToOne(() => User, (user) => user.otp)
     user: User
