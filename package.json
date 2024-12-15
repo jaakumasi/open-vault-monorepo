@@ -55,6 +55,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "18.16.9",
     "@types/pdf-parse": "^1.1.4",
+    "@types/pg": "^8.11.10",
     "@typescript-eslint/utils": "^8.0.0",
     "angular-eslint": "^18.3.0",
     "cypress": "^13.13.0",

@@ -1,14 +1,16 @@
 import express, { response } from 'express';
 import cors from 'cors';
 import formidable from 'formidable';
-import { readFileBuffer } from './utils/file-utils';
-import { S3Service } from './services/s3.service';
+import { readFileBuffer } from './shared/utils/file-utils';
+import { S3Service } from './services/utils/s3.service';
 import { promises as fs } from 'fs';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { env } from './config/env';
-import { s3Client } from './services/s3-client.service';
-import { PdfService } from './services/pdf.service';
+import { s3Client } from './services/utils/s3-client.service';
+import { PdfService } from './services/utils/pdf.service';
 import path from 'path';
+import "reflect-metadata";
+import dataSource from './db/data-source';
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -25,6 +27,11 @@ app.use(express.json())
 app.get('/', (req, res) => {
   res.send({ message: 'ping success' });
 });
+
+dataSource.initialize().then(() => {
+  console.log('db connection established')
+})
+  .catch(e => console.log(e.message))
 
 app.delete('/pdf', async (req, res) => {
   const key = 'uploads/1734242671431-js cheat sheet.pdf'
@@ -78,7 +85,7 @@ app.post('/upload-file', async (req, res, next) => {
 
     const pdfService = new PdfService();
     // const { title, author, coverImageBuffer } = await pdfService.extractPdfInfo(fileBuffer);
-    const {totalPages, author, title} = await pdfService.extractPdfInfo(fileBuffer);
+    const { totalPages, author, title } = await pdfService.extractPdfInfo(fileBuffer);
     // const coverImageUrl = await s3Service.uploadFile(
     //   coverImageBuffer,
     //   `${title}-cover.png`,
