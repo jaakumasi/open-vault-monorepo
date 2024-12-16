@@ -1,0 +1,8 @@
+<div class="flex justify-center">
+    <input #input
+        [placeholder]="placeholder"
+        class="w-full md:w-[70%] py-[0.8rem] text-center px-14 outline-none border-outline border-[0.1rem] rounded-md placeholder:text-[#7b7b7b] focus:border-accent" 
+        (ngModelChange)="onInputChange($event)"    
+        [(ngModel)]="_"
+    />
+</div>

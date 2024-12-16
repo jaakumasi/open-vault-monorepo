@@ -1,19 +1,19 @@
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Request, Response } from "express";
-import dataSource from "../../db/data-source";
-import { Book } from "../../db/entities/book.entity";
-import { BAD_REQUEST, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from "../../shared/constants";
-import { ResponseObject } from "../../shared/types";
 import formidable from "formidable";
 import { promises as fs } from 'fs';
-import { S3Service } from "../s3.service";
-import { PdfService } from "../pdf.service";
-import { BookUploadDto } from "../../dtos/upload-book.dto";
+import { ILike } from "typeorm";
+import { env } from "../../config/env";
+import dataSource from "../../db/data-source";
+import { Book } from "../../db/entities/book.entity";
 import { User } from "../../db/entities/user.entity";
+import { BookSearchDto } from "../../dtos/book-search.dto";
+import { BAD_REQUEST, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from "../../shared/constants";
+import { ResponseObject } from "../../shared/types";
 import { logger } from "../../shared/utils/logger.util";
 import { internalServerErrorResponseHandler } from "../../shared/utils/response.util";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { env } from "../../config/env";
-import { setServers } from "dns";
+import { PdfService } from "../pdf.service";
+import { S3Service } from "../s3.service";
 
 const bookRepo = dataSource.getRepository(Book);
 const userRepo = dataSource.getRepository(User);
@@ -43,7 +43,6 @@ export const handlePostBookRequest = async (req: Request, res: Response) => {
     if (!formidableUploadBreakdown) return;
     const { file, fields, fileBuffer } = formidableUploadBreakdown;
 
-
     // extract book metadata
     let { totalPages, author, title } = await extractBookMetadata(fileBuffer);
     title = fields.title[0] ?? title;
@@ -64,7 +63,6 @@ export const handlePostBookRequest = async (req: Request, res: Response) => {
                 author,
                 description,
                 totalPages,
-                // bookUrl: fileUrl,
                 users: [user]
             })
 
@@ -217,6 +215,25 @@ export const handleDeleteUploadedBookRequest = async (req: Request, res: Respons
     }
 }
 
+export const handleBookSearchRequest = async (req: Request, res: Response) => {
+    const { query } = req.body as BookSearchDto
+
+    try {
+        const books = await bookRepo.find({
+            where: {
+                title: ILike(`%${query}%`),
+            },
+        });
+
+        res.status(STATUS_CODES.OK).json({
+            statusCode: STATUS_CODES.OK,
+            data: books
+        } as ResponseObject)
+    } catch (error) {
+        logger(error.message)
+        internalServerErrorResponseHandler(res, error.message);
+    }
+}
 
 const deleteFileFromS3Bucket = async (bookUrl: string, res: Response) => {
     // const bookKey = 'uploads/1734242671431-js cheat sheet.pdf'

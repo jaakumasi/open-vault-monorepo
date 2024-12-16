@@ -38,6 +38,15 @@ export interface SocialLoginProvider {
 
 export type UserRole = "user" | "superUser"
 
+export type ToastVariant = 'success' | 'error' | 'info';
+
+export interface ToastState {
+    showToast: boolean;
+    toastMessage: string;
+    toastVariant: ToastVariant;
+    timeout?: number;
+};
+
 export interface GoogleUser {
     iss: string;
     azp: string;

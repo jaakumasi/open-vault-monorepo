@@ -1,0 +1,52 @@
+<div>
+    <h4 class="my-4 text-xl">Upload a book</h4>
+
+    <p>Fill the form or optionally leave fields blank for metadata extraction. </p>
+    <p class="mb-2">A file must be uploaded though.</p>
+
+    <p class="mb-2">{{uploadFeedbackMessage()}}</p>
+
+    <form (ngSubmit)="onSubmit()">
+        <input 
+            type="text" 
+            name="title"
+            placeholder="Title"
+            [(ngModel)]="formData.title"
+            class="w-full mb-3 p-[0.8rem] outline-none border-outline border-[0.1rem] rounded-md placeholder:text-[#7b7b7b] focus:border-accent"
+        />
+
+        <input 
+            type="text" 
+            name="author"
+            placeholder="Author"
+            [(ngModel)]="formData.author"
+            class="w-full mb-3 p-[0.8rem] outline-none border-outline border-[0.1rem] rounded-md placeholder:text-[#7b7b7b] focus:border-accent"
+        />
+
+        <input 
+            type="text" 
+            name="description"
+            placeholder="Description"
+            [(ngModel)]="formData.description"
+            class="w-full mb-3 p-[0.8rem] outline-none border-outline border-[0.1rem] rounded-md placeholder:text-[#7b7b7b] focus:border-accent"
+        />
+
+        <input 
+            type="file"
+            name="file"
+            (change)="onFileSelected($event)"
+            class="mb-3"
+            required
+        />
+
+        <div class="lg:w-[50%]">
+            <app-action-btn 
+                [isEnabled]="!!selectedFile"
+                btnText="Upload"
+                [isLoading]="isUploadingBook()"
+                (clickEventEmitter)="onSubmit()"
+            />
+        </div>
+
+    </form>
+</div>

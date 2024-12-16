@@ -1,7 +1,13 @@
 <div 
     class="relative w-full text-center p-[0.7rem] bg-active-btn border-solid border-black border-[2px] rounded-md hover:bg-accent transition-colors hover:cursor-pointer"
-    [ngClass]="{'is_disabled': !isEnabled}"
-    (click)="onClick()">
+    [ngClass]="{
+        'is_disabled': !isEnabled,
+        'small': size === 'small',
+        'warning': btnType === 'warning'
+    }"
+    (click)="onClick()"
+    role="button"
+>
     {{btnText}}
     @if (isLoading) {
         <img 

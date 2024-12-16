@@ -1,0 +1,20 @@
+<div class="flex justify-between items-center">
+    <h2 class="text-center my-1 text-2xl font-bold">Open Vault</h2>
+
+    <div class="flex gap-3">
+        <!-- @if (showManageBooksButton()) { -->
+            <app-action-btn
+                btnText="Manage Books"
+                size="small"
+                (clickEventEmitter)="onManageBooks()"
+            />
+        <!-- } -->
+
+        <app-action-btn
+            btnType="warning"
+            [btnText]="showSigninButton() ? 'Login' : 'Logout out'"
+            size="small"
+            (clickEventEmitter)="handleAuth()"
+        />
+    </div>
+</div>

@@ -1,0 +1,28 @@
+<div>
+    <h4 class="text-4xl mt-6 mb-1 text-center">Safeguard Knowledge, </h4>
+    <h3 class="text-3xl mb-6 text-center">Share with All.</h3>
+</div>
+
+<app-search placeholder="Search a book" (queryEmitter)="onSearchBook($event)" />
+
+<!--books-->
+<div>
+    @if (isFetchingBooks()) {
+        <img src="assets/images/loading.gif" alt="loader" class="w-12 h-12 my-12 mx-auto">
+    }
+    @else if(errorMessage()) {
+        <h3 class="text-center text-red-500 my-12">{{ errorMessage() }}</h3>
+    }
+    @else {
+        <div class="my-6">
+            @for (book of books(); track $index) {
+                <app-book-card [book]="book"/>
+            }
+            @empty {
+                <h3 class="text-center">No books found</h3>
+            }
+        </div>
+    }
+
+
+</div>

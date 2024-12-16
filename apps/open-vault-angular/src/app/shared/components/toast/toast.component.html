@@ -1,0 +1,11 @@
+<div
+  class="toast"
+  [ngClass]="{
+    success: variant() === 'success',
+    error: variant() === 'error',
+    info: variant() === 'info',
+    show: show(),
+  }"
+>
+  <div>{{ text() }}</div>
+</div>

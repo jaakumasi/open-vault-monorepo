@@ -10,8 +10,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ActionBtnComponent  {
   @Input() btnText = '';
-  @Input() isEnabled = false;
+  @Input() size: 'small' | 'medium' = 'medium';
+  @Input() isEnabled = true;
   @Input() isLoading = false;
+  @Input() btnType: 'info' | 'warning' = 'info';
   @Output() clickEventEmitter = new EventEmitter<null>();
 
   onClick() {

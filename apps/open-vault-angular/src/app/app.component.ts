@@ -6,10 +6,11 @@ import { BREAKPOINTS } from './shared/constants';
 import { BreakpointObserverService } from './shared/services/breakpoint-observer.service';
 import { updateScreenSize } from './shared/store/actions.store';
 import { SCREEN_SIZE } from './shared/types';
+import { ToastComponent } from "./shared/components/toast/toast.component";
 
 @Component({
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
 })
