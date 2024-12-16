@@ -18,9 +18,10 @@ export const BAD_REQUEST = {
     INVALID_OTP: 'OTP is invalid/expired',
     IS_SOCIAL_LOGIN: 'Social login field is required',
     MISMATCHING_OTP: 'Please provide the otp sent to YOUR email',
-    NO_TOKEN: 'No token provided',
+    NO_OR_INVALID_TOKEN: 'No/invalid token provided',
     PASSWORD_NOT_SET: 'You previously signed up using a social provider. Please set a password',
     REQUEST_OTP: 'Request an OTP to proceed',
+    UNAUTHORIZED: 'You do not have access to this resource',
     UNAUTHORIZED_OTP: 'OTP is invalid/expired',
     UNAUTHORIZED_SIGNIN: 'Invalid email/password',
     UNVERIFIED_OTP:
@@ -69,3 +70,8 @@ export const REDIRECT_TO = {
     PASSWORD_RESET: '/auth/password-reset',
     SIGNIN: '/auth/signin',
 };
+
+export const COOKIES = {
+    ACCESS_TOKEN: 'acctoken',
+    REFRESH_TOKEN:'refresh_token',
+}

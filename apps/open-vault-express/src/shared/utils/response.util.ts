@@ -19,3 +19,10 @@ export const internalServerErrorResponseHandler = (res: Response, message = SERV
     } as ResponseObject)
 }
 
+export const unauthorizedErrorResponseHandler = (res: Response, message = BAD_REQUEST.UNAUTHORIZED) => {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        statusCode: STATUS_CODES.UNAUTHORIZED,
+        message
+    } as ResponseObject)
+}
+

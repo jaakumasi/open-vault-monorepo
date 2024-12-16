@@ -19,8 +19,14 @@ export class Book {
     @Column({ type: "varchar", length: 255 })
     author: string;
 
-    @Column({ type: "text", nullable: true })
+    @Column({ type: "text" })
     description: string;
+
+    @Column({ type: "text" })
+    bookUrl: string;
+
+    @Column({ type: "varchar", length: 5 })
+    totalPages: string;
 
     @ManyToMany(() => User, (user) => user.books)
     users: User[]

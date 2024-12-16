@@ -10,7 +10,8 @@ export const signToken = async (payload: any, expiration?: string) => {
 
 export const verifyToken = async (token: string) => {
     try {
-        return verify(token, process.env.JWT_SECRET)
+        const decodedToken = verify(token, process.env.JWT_SECRET)
+        return decodedToken
     } catch (error) {
         throw new Error(error)
     }
