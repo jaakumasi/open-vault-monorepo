@@ -29,37 +29,10 @@ app.get('/', (req, res) => {
 });
 
 dataSource.initialize().then(() => {
-  console.log('db connection established')
+  logger('db connection established')
 })
-  .catch(e => console.log(e.message))
+  .catch(e => logger(e.message))
 
-app.delete('/pdf', async (req, res) => {
-  const key = 'uploads/1734242671431-js cheat sheet.pdf'
-
-  // if (!key) {
-  //   return res.status(400).json({ error: 'No key provided' });
-  // }
-
-  const s3Service = new S3Service();
-
-  const params = {
-    Bucket: env.aws.bucketName,
-    Key: key,
-  }
-  const command = new DeleteObjectCommand(params)
-
-  // try {
-  //   await s3Client.send(command);
-  //   res.json({ message: 'File deleted successfully' });
-  // } catch (error) {
-  //   console.log(error.message)
-  //   res.status(500).send('Error deleting file');
-  // }
-})
-
-app.post('/upload-file', async (req, res, next) => {
-  
-})
 
 app.use('/api/v1/auth', authRouter);
 
@@ -67,8 +40,6 @@ app.use('/api/v1/books', bookRouter);
 
 /* JWT Auth middleware for routes requiring authorization */
 app.use(verifyJWT)
-
-// app.use('/api/v1/upload-book', )
 
 
 
