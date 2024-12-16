@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 import { NextFunction, Request, Response } from "express";
 import dataSource from "../../db/data-source";
 import { User } from "../../db/entities/user.entity";
@@ -39,13 +39,21 @@ export const handleSigninRequest = async (req: Request, res: Response, next: Nex
         if (!user.otpVerified)
             return handleUnverifiedOtpResponse(res, userDto, user);
 
+        /* Form signins with invalid passwords get bounced ❌. Valid ones go through ✅ */
+        if (!userDto.isSocialLogin)
+            return handleFormSignin(res, userDto, user);
+
+        /* OTP verified social logins go through ✅ */
+        if (userDto.isSocialLogin && user.otpVerified)
+            return handleValidSigninRequest(res, user);
+
 
     } catch (error) {
         logger(error.message)
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        res.status(STATUS_CODES.BAD_REQUEST)
             .json({
-                statusCode: STATUS_CODES.INTERNAL_SERVER_ERROR,
-                message: SERVER_ERRORS.CREATE_USER
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: error.message
             } as ResponseObject)
     }
 }
@@ -70,6 +78,55 @@ const handleUnverifiedOtpResponse = async (res: Response, userDto: UserAuthDto, 
             redirectTo: REDIRECT_TO.OTP_VERIFICATION,
             scenario: verificationScenario,
         }
+    } as ResponseObject)
+}
+
+const handleFormSignin = async (res: Response, userDto: UserAuthDto, user: User) => {
+    const incomingPassword = userDto.password;
+    const savedPassword = user.password;
+
+    try {
+        if (!incomingPassword)
+            throw new Error(BAD_REQUEST.PASSWORD_REQUIRED)
+        else if (!savedPassword) {
+            /* Users who registered using a social provider have no password set,
+             * hence must be redirected to set one. */
+            res.status(STATUS_CODES.BAD_REQUEST).json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: BAD_REQUEST.PASSWORD_NOT_SET,
+                data: {
+                    redirectTo: REDIRECT_TO.PASSWORD_RESET,
+                },
+            } as ResponseObject)
+        }
+
+        const matches = await compare(incomingPassword, savedPassword);
+
+        if (!matches) {
+            res.status(STATUS_CODES.UNAUTHORIZED).json({
+                statusCode: STATUS_CODES.UNAUTHORIZED,
+                message: BAD_REQUEST.UNAUTHORIZED_SIGNIN,
+            } as ResponseObject)
+        } else
+            return handleValidSigninRequest(res, user)
+
+    } catch (error) {
+        logger(error.message);
+        throw new Error(error)
+    }
+}
+
+const handleValidSigninRequest = async (res: Response, user: User) => {
+    const { password: _, ...userMinusPassword } = user;
+
+    res.status(STATUS_CODES.OK).json({
+        statusCode: STATUS_CODES.OK,
+        message: SUCCESSFUL_REQUEST.SIGNIN_SUCCESS,
+        data: {
+            token: await getAuthToken({ email: userMinusPassword.email }),
+            user: userMinusPassword,
+            redirectTo: REDIRECT_TO.HOME,
+        },
     } as ResponseObject)
 }
 
@@ -175,7 +232,16 @@ export const handleVerifyOTPRequest = async (req: Request, res: Response, next: 
         } as ResponseObject)
     }
 
-    const verificationResponse = await verifyOtpCode(req.body, res)
+    let verificationResponse: ResponseObject | null = null;
+
+    try {
+        verificationResponse = await verifyOtpCode(req.body, res)
+    } catch (error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            statusCode: STATUS_CODES.BAD_REQUEST,
+            message: error.message
+        } as ResponseObject)
+    }
 
     let data: { token?: string; redirectTo: string };
     if (verificationScenario === "passwordReset") {

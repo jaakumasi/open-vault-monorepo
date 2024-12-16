@@ -10,6 +10,7 @@ import { sendMail } from "./mail.service";
 import { findUserByEmail } from "./controller-services/auth.service";
 import { ResponseObject } from "../shared/types";
 import { internalServerErrorResponseHandler } from "../shared/utils/response.util";
+import { JwtPayload } from "jsonwebtoken";
 
 const otpRepo = dataSource.getRepository(Otp)
 
@@ -66,18 +67,20 @@ export const verifyOtpCode = async (body: VerifyOtpDto, res: Response) => {
 
         const otpRecord = await findOtpByAssociatedMail(email)
         if (!otpRecord)
-            res.status(STATUS_CODES.BAD_REQUEST).json({
+            return {
                 statusCode: STATUS_CODES.BAD_REQUEST,
                 message: BAD_REQUEST.REQUEST_OTP
-            })
+            } as ResponseObject;
 
         /* Users can't validate with OTPs that are not theirs */
-        if (email !== otpRecord.email)
-            res.status(STATUS_CODES.BAD_REQUEST).json({
+        if (email !== otpRecord.email) {
+            return {
                 statusCode: STATUS_CODES.BAD_REQUEST,
                 message: BAD_REQUEST.MISMATCHING_OTP
-            })
-
+            } as ResponseObject;;
+        }
+        /* Can't request for OTP verification if its not `password reset` request and
+         * and user is already OTP verified */
         if (
             verificationScenario !== "passwordReset" &&
             user.otpVerified
@@ -85,12 +88,12 @@ export const verifyOtpCode = async (body: VerifyOtpDto, res: Response) => {
             return {
                 statusCode: STATUS_CODES.BAD_REQUEST,
                 message: BAD_REQUEST.ALREADY_VALIDATED,
-            };
+            } as ResponseObject;;
         }
 
-        const decodedOtp = await verifyToken(otpRecord.code)
+        const decodedOtp = await verifyToken(otpRecord.code) as JwtPayload
 
-        if (otp === decodedOtp) {
+        if (otp == decodedOtp.otp) {
             await userRepo.update(user.id, {
                 otpVerified: true
             })
@@ -111,11 +114,7 @@ export const verifyOtpCode = async (body: VerifyOtpDto, res: Response) => {
 
     } catch (error) {
         logger(error.message)
-        res.status(STATUS_CODES.BAD_REQUEST)
-            .json({
-                statusCode: STATUS_CODES.BAD_REQUEST,
-                message: BAD_REQUEST.INVALID_OTP
-            })
+        throw new Error(error);
     }
 }
 
