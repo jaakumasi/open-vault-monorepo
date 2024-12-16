@@ -37,7 +37,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
 
         verify(token, process.env.JWT_SECRET, (err: Error, user) => {
             if (err)
-                return res.status(STATUS_CODES.BAD_REQUEST).json({ error: err.message })
+                return res.status(STATUS_CODES.BAD_REQUEST).json({ message: err.message })
 
             req[MIDDLEWARE_ATTACHMENTS.USER] = user;
             next();
