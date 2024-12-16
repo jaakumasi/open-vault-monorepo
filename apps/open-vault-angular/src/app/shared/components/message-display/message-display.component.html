@@ -1,0 +1,8 @@
+<div class="w-full max-h-6 text-center mb-1">
+    <div 
+        class="min-h-6 text-[1rem] font-bold" 
+        [class.text-error]="type === 'error'"
+        [class.text-accent]="type === 'success'">
+        {{message}}
+    </div>
+</div>

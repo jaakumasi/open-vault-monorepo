@@ -3,13 +3,15 @@ import { NextFunction, Request, Response } from "express";
 import dataSource from "../../db/data-source";
 import { User } from "../../db/entities/user.entity";
 import { UserAuthDto } from "../../dtos/user-auth.dto";
-import { BAD_REQUEST, EXPIRY, HASH, REDIRECT_TO, SERVER_ERRORS, STATUS_CODES, SUCCESSFUL_REQUEST } from "../../shared/constants";
+import { BAD_REQUEST, EXPIRY, HASH, REDIRECT_TO, SERVER_ERRORS, STATUS_CODES, SUCCESSFUL_REQUEST, VERIFICATION_SCENARIO } from "../../shared/constants";
 import { ResponseObject, VerificationScenario } from "../../shared/types";
 import { logger } from "../../shared/utils/logger.util";
 import { internalServerErrorResponseHandler } from "../../shared/utils/response.util";
 import { createOtpRecord, findOtpByAssociatedMail, verifyOtpCode } from "../otp.service";
 import { VerifyOtpDto } from '../../dtos/verify-otp.dto';
 import { signToken } from '../../shared/utils/token.util';
+import { RequestOtpDto } from '../../dtos/request-otp.dto';
+import { ResetPasswordDto } from '../../dtos/reset-password.dto';
 
 const userRepo = dataSource.getRepository(User);
 
@@ -188,6 +190,10 @@ export const handleSignupRequest = async (req: Request, res: Response, next: Nex
         res.status(STATUS_CODES.CREATED).json({
             statusCode: STATUS_CODES.CREATED,
             message: SUCCESSFUL_REQUEST.OTP_CREATED,
+            data: {
+                redirectTo: REDIRECT_TO.OTP_VERIFICATION,
+                scenario: VERIFICATION_SCENARIO.FORM_SIGNUP,
+            },
         } as ResponseObject)
     } catch (error) {
         logger(error.message)
@@ -205,12 +211,76 @@ export const findUserByEmail = async (email: string, res: Response) => {
     }
 }
 
-export const handleOTPRequest = (req: Request, res: Response, next: NextFunction) => {
+export const handleOTPRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body as RequestOtpDto;
 
+    try {
+        const user = await findUserByEmail(email, res);
+
+        if (!user) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: BAD_REQUEST.USER_DOES_NOT_EXIST,
+            } as ResponseObject)
+        }
+
+        await createOtpRecord(user);
+
+        res.status(STATUS_CODES.CREATED).json({
+            statusCode: STATUS_CODES.CREATED,
+            message: SUCCESSFUL_REQUEST.OTP_CREATED,
+        } as ResponseObject)
+
+    } catch (error) {
+        logger(error.message)
+        res.status(STATUS_CODES.BAD_REQUEST)
+            .json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: error.message
+            } as ResponseObject)
+    }
 }
 
-export const handlePasswordResetRequest = (req: Request, res: Response, next: NextFunction) => {
+export const handlePasswordResetRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body as ResetPasswordDto;
 
+    try {
+        const user = await findUserByEmail(email, res);
+
+        if (!user) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: BAD_REQUEST.USER_DOES_NOT_EXIST,
+            } as ResponseObject)
+        }
+
+
+        if (!user.otpVerified) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: BAD_REQUEST.UNVERIFIED_OTP,
+            } as ResponseObject)
+        } 
+
+        const newHashedPassword = await hash(
+            password,
+            HASH.SALT_ROUNDS,
+        );
+        await userRepo.update(user.id, { password: newHashedPassword });
+
+        res.status(STATUS_CODES.OK).json({
+            statusCode: STATUS_CODES.ACCEPTED,
+            message: SUCCESSFUL_REQUEST.PASSWORD_RESSET_SUCCESS,
+        } as ResponseObject)
+
+    } catch (error) {
+        logger(error.message)
+        res.status(STATUS_CODES.BAD_REQUEST)
+            .json({
+                statusCode: STATUS_CODES.BAD_REQUEST,
+                message: error.message
+            } as ResponseObject)
+    }
 }
 
 /**

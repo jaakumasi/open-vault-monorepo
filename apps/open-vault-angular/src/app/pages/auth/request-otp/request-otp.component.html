@@ -1,0 +1,45 @@
+<div>
+    <open-vault-banner />
+
+    <form [formGroup]="requestOtpForm" class="xl:w-[50%] mx-auto">
+        <!--email && invalid email input message-->
+        <div>
+            <app-form-control
+                formControlName="email"
+                type="email"
+                iconPath="./assets/images/mail.svg"
+                placeholder="Email"
+                [invalidInput]="emailRequired! || emailPatternInvalid!">
+            </app-form-control>
+
+            <!--invalid email message-->
+            <app-invalid-input-message
+                [message]="emailRequired ? 'required': emailPatternInvalid ? 'enter a valid email': ''">
+            </app-invalid-input-message> 
+        </div>  
+
+        <!--send otp btn-->            
+        <app-action-btn 
+            btnText="Send OTP"
+            [isEnabled]="isFormValid() && !isMakingRequest()"
+            [isLoading]="isMakingRequest()"
+            (clickEventEmitter)="onSubmit()">
+        </app-action-btn>
+    </form>
+
+    <!--non-existing user error message-->
+    @if (showNonExistingUserError()) {
+        <div>
+            <app-message-display
+                [message]="httpErrorResponse()" 
+                type="error"
+            />
+            
+            <div 
+                class="text-accent text-center mt-2 text-[1rem]" 
+                [routerLink]="signinPage()">
+                Create an account?
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,75 @@
+<div>
+    <open-vault-banner />
+    
+    <form [formGroup]="signupForm">
+        <div class="w-full mx-auto sm:w-1/2">
+            <!--space-->
+            <div class="w-full h-[1.3rem]"></div>
+
+            <!--email-->
+            <app-form-control 
+                formControlName="email"
+                type="text" 
+                iconPath="./assets/images/mail.svg" 
+                placeholder="Email"
+                [invalidInput]="emailRequired! || emailPatternInvalid! || showHttpErrorResponse()">
+            </app-form-control>
+
+             <!--invalid email message-->
+            <app-invalid-input-message
+                [message]="emailRequired ? 'required': emailPatternInvalid ? 'enter a valid email': showHttpErrorResponse() ? httpErrorMessage(): ''">
+            </app-invalid-input-message>
+
+            <!--password-->
+            <app-form-control 
+                formControlName="password"
+                type="password" 
+                iconPath="./assets/images/password.svg" 
+                placeholder="Password" 
+                [invalidInput]="passwordRequired! || passwordTooShort!">
+            </app-form-control>
+
+            <!--invalid password message-->
+            <app-invalid-input-message
+                [message]="passwordRequired ? 'required': passwordTooShort ? 'too short. 8 characters minimum': ''">
+            </app-invalid-input-message>      
+
+            <!--confirm password-->
+            <app-form-control 
+                formControlName="confirmPassword"
+                type="password" 
+                iconPath="./assets/images/password.svg" 
+                placeholder="Confirm Password" 
+                [invalidInput]="confirmPasswordRequired! || passwordMismatch!">
+            </app-form-control>
+
+             <!--invalid confirm password message-->
+            <app-invalid-input-message
+                [message]="confirmPasswordRequired ? 'required': passwordMismatch ? 'password mismatch': ''">
+            </app-invalid-input-message>            
+
+            <!--sign up button-->
+            <app-action-btn 
+                btnText="Sign up" 
+                (clickEventEmitter)="onSignup()" 
+                [isEnabled]="isSubmitEnabled()"
+                [isLoading]="isMakingRequest()">
+            </app-action-btn>
+
+            <!--space-->
+            <div class="w-full h-1"></div>
+
+            <!--go to signin-->
+            @if (!isMakingRequest()) {
+                <div class="text-center">
+                    Already have an account? 
+                    <span 
+                        class="text-accent hover:cursor-pointer" 
+                        routerLink="/auth/signin">
+                        Sign in
+                    </span>
+                </div>
+            }
+        </div>
+    </form>
+</div>

@@ -1,5 +1,5 @@
 import express from "express";
-import { BookUploadDto as UploadBookDto } from "../dtos/upload-book";
+import { BookUploadDto as UploadBookDto } from "../dtos/upload-book.dto";
 import { validateBody, verifyJWT } from "../middlewares/auth";
 import { handleDeleteUploadedBookRequest, handleGetBooksRequest, handleGetUploadedBooksOfUserRequest, handlePostBookRequest } from "../services/controller-services/book.service";
 

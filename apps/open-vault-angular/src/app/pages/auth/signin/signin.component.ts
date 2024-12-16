@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, NgZone, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -7,34 +7,35 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ActionBtnComponent } from "../../../shared/components/action-btn/action-btn.component";
 import { FormControlComponent } from "../../../shared/components/form-control/form-control.component";
 import { FormDividerComponent } from "../../../shared/components/form-divider/form-divider.component";
 import { GoogleAuthComponent } from "../../../shared/components/google-auth/google-auth.component";
 import { InvalidInputMessageComponent } from "../../../shared/components/invalid-input-message/invalid-input-message.component";
+import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
 import { CLIENT_ENDPOINTS, STORAGE_KEYS } from '../../../shared/constants';
 import { updateUser } from '../../../shared/store/actions.store';
 import { FormSignupRequest, GoogleUser, ResponseObject, SocialSignupRequest, User } from '../../../shared/types';
 import { emailValidator } from '../../../shared/validators/email.validator';
 import { AuthApiService } from '../shared/services/auth-api.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signin',
   standalone: true,
   imports: [
-    HttpClientModule,
+    ActionBtnComponent,
     ReactiveFormsModule,
     CommonModule,
     GoogleAuthComponent,
     FormDividerComponent,
     FormControlComponent,
-    ActionBtnComponent,
-    InvalidInputMessageComponent
-  ],
+    InvalidInputMessageComponent,
+    RouterLink,
+    OpenVaultBannerComponent
+],
   templateUrl: './signin.component.html',
-  providers: [AuthApiService]
 })
 export class SigninComponent implements OnInit {
   router = inject(Router);
@@ -81,6 +82,7 @@ export class SigninComponent implements OnInit {
     let decodedUser: GoogleUser;
     if (isSocialSignin) {
       decodedUser = this.decodeCredentials(encodedUserCredentials!);
+      console.log(decodedUser)
       requestBody = {
         email: decodedUser.email,
         isSocialLogin: true,
@@ -120,6 +122,8 @@ export class SigninComponent implements OnInit {
   async handleSuccessResponse(response: ResponseObject) {
     this.onRequestEnd();
 
+    this.saveToken(response);
+
     const redirectTo = response.data?.redirectTo;
     this.updateStore(response.data?.user!);
 
@@ -151,8 +155,16 @@ export class SigninComponent implements OnInit {
   }
 
   saveEmail(email: string) {
-    globalThis.localStorage.setItem(STORAGE_KEYS.EMAIL, email);
+    globalThis.window?.localStorage.setItem(STORAGE_KEYS.EMAIL, email);
   }
+
+  saveToken(response: ResponseObject) {
+    globalThis.window?.localStorage.setItem(
+      STORAGE_KEYS.TOKEN,
+      response.data!.token
+    );
+  }
+
 
   decodeCredentials(credentials: {
     credential: string;

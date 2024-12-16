@@ -7,7 +7,7 @@ import formidable from "formidable";
 import { promises as fs } from 'fs';
 import { S3Service } from "../s3.service";
 import { PdfService } from "../pdf.service";
-import { BookUploadDto } from "../../dtos/upload-book";
+import { BookUploadDto } from "../../dtos/upload-book.dto";
 import { User } from "../../db/entities/user.entity";
 import { logger } from "../../shared/utils/logger.util";
 import { internalServerErrorResponseHandler } from "../../shared/utils/response.util";

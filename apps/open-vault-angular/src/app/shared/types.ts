@@ -6,12 +6,12 @@ export enum SCREEN_SIZE {
     'xlarge' = 'xlarge',
 }
 
-export type GlobalState = {
+export interface GlobalState {
     screenSize: SCREEN_SIZE;
     user: User | null;
 };
 
-export type User = {
+export interface User {
     id: string;
     email: string;
     otpVerified: true;
@@ -20,7 +20,7 @@ export type User = {
     role: UserRole
 };
 
-export type Book = {
+export interface Book {
     id: string;
     title: string;
     author: string;
@@ -30,7 +30,7 @@ export type Book = {
     users: User[];
 }
 
-export type SocialLoginProvider = {
+export interface SocialLoginProvider {
     name: string;
     profilePicUrl: string;
     provider: string;
@@ -71,8 +71,13 @@ export interface SocialSignupRequest {
     };
 }
 
-export type ResponseObject = {
+export interface ResponseObject {
     statusCode: number;
     message?: string;
     data?: any
-  };
+};
+
+export interface PasswordReset {
+    email: string;
+    password: string;
+}

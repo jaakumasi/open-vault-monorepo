@@ -11,6 +11,14 @@ export const STORAGE_KEYS = {
     EMAIL: 'mail'
 }
 
+export const VERIFICATION_SCENARIO = {
+    PASSWORD_RESET: 'password-reset',
+    FORM_SIGNUP: 'form-signup',
+    SOCIAL_SIGNUP: 'social-signup',
+}
+
+export const REDIRECTION_TIMEOUT = 2000;
+
 /* Client Endpoints */
 export const CLIENT_ENDPOINTS = {
     /* AUTH */
@@ -25,7 +33,9 @@ export const CLIENT_ENDPOINTS = {
 /* Server Endpoints */
 export const SERVER_URL = 'http://127.0.0.1:3000';
 
-export const SIGNIN_URL = `${SERVER_URL}/api/v1/auth/signin`
+export const SIGNIN_URL = `${SERVER_URL}/api/v1/auth/signin`;
 export const SINGUP_URL = `${SERVER_URL}/api/v1/auth/signup`
-export const OTP_VERIFICATION_URL = `${SERVER_URL}/api/v1/auth/verify-otp`
+export const OTP_VERIFICATION_URL = `${SERVER_URL}/api/v1/auth/verify-otp`;
+export const REQUEST_OTP_URL = `${SERVER_URL}/api/v1/auth/request-otp`;
+export const RESET_PASSWORD_URL = `${SERVER_URL}/api/v1/auth/reset-password`;
 

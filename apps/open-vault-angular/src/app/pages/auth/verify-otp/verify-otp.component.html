@@ -1,0 +1,59 @@
+<div>
+    <open-vault-banner />
+
+    <h3 class="text-center">Verify OTP</h3>
+
+    <!--otp verification status-->
+    <app-message-display 
+        [type]="
+            isVerifying() ? 'log': 
+            isVerificationComplete() ? 'success':
+            'error'
+        " 
+        [message]="
+            isVerifying() ? 'Verifying OTP': 
+            isVerificationComplete() ? 'OTP verified. Redirecting...':
+            showErrorResponse() ? errorResponse(): ''
+        "
+    />
+   
+
+    <!--otp input boxes-->
+    <div class="flex justify-between">
+        <input
+            [ngClass]="{ error: showErrorResponse() }"
+            class="w-[75px] h-[75px] lg:w-[140px] lg:h-[140px] 2xl:w-[200px] 2xl:h-[200px] text-[40px] xl:text-[56px] text-center border-solid border-[2px] border-outline bg-white rounded-md focus:border-accent focus:outline-none"
+            [(ngModel)]="otpInput1" (ngModelChange)="onOtpChange($event, otp2)" 
+            maxlength="1"
+        />
+        <input #otp2
+            [ngClass]="{ error: showErrorResponse() }"
+            class="w-[75px] h-[75px] lg:w-[140px] lg:h-[140px] 2xl:w-[200px] 2xl:h-[200px] text-[40px] xl:text-[56px] text-center border-solid border-[2px] border-outline bg-white rounded-md focus:border-accent focus:outline-none"
+            [(ngModel)]="otpInput2" (ngModelChange)="onOtpChange($event, otp3)" 
+            maxlength="1"
+        />
+        <input #otp3
+            [ngClass]="{ error: showErrorResponse() }"
+            class="w-[75px] h-[75px] lg:w-[140px] lg:h-[140px] 2xl:w-[200px] 2xl:h-[200px] text-[40px] xl:text-[56px] text-center border-solid border-[2px] border-outline bg-white rounded-md focus:border-accent focus:outline-none"
+            [(ngModel)]="otpInput3" (ngModelChange)="onOtpChange($event, otp4)" 
+            maxlength="1"
+        />
+        <input #otp4
+            [ngClass]="{ error: showErrorResponse() }"
+            class="w-[75px] h-[75px] lg:w-[140px] lg:h-[140px] 2xl:w-[200px] 2xl:h-[200px] text-[40px] xl:text-[56px] text-center border-solid border-[2px] border-outline bg-white rounded-md focus:border-accent focus:outline-none"
+            [(ngModel)]="otpInput4" (ngModelChange)="onOtpChange($event, null)"
+            maxlength="1"
+        />
+    </div>
+
+    <!--space-->
+    <div #space class="w-full h-3"></div>
+
+    <!--resend otp & timer-->
+    <div class="flex justify-between px-1">
+        <div class="text-accent hover:cursor-pointer" (click)="onResendOtp()">
+            {{ allowResend() ? 'Resend OTP': '' }}
+        </div>
+        <div>{{ formattedWaitTime() }}</div>
+    </div>
+</div>

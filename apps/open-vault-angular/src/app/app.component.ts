@@ -1,20 +1,17 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { BreakpointState } from '@angular/cdk/layout';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { switchMap } from 'rxjs';
-import { SCREEN_SIZE } from './shared/types';
-import { BREAKPOINTS } from './shared/constants';
-import { BreakpointState } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
+import { BREAKPOINTS } from './shared/constants';
 import { BreakpointObserverService } from './shared/services/breakpoint-observer.service';
 import { updateScreenSize } from './shared/store/actions.store';
+import { SCREEN_SIZE } from './shared/types';
 
 @Component({
   standalone: true,
   imports: [RouterOutlet],
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   store = inject(Store);

@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { BAD_REQUEST, COOKIES, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from '../shared/constants';
+import { BAD_REQUEST, COOKIES, HEADER, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from '../shared/constants';
 import { logger } from '../shared/utils/logger.util';
 import { ResponseObject } from '../shared/types';
 import { unauthorizedErrorResponseHandler } from '../shared/utils/response.util';
@@ -27,10 +27,10 @@ export function validateBody<T>(type: new () => T) {
 }
 
 export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
-    // const token: string = req.get(HEADERS.AUTHORIZATION)?.split(" ")[1];
 
     try {
-        const token: string = req.cookies[COOKIES.ACCESS_TOKEN]
+        // const token: string = req.cookies[COOKIES.ACCESS_TOKEN]
+        const token: string = req.get(HEADER.AUTHORIZATION)?.split(" ")[1];
 
         if (!token)
             return unauthorizedErrorResponseHandler(res)

@@ -73,5 +73,15 @@ export const REDIRECT_TO = {
 
 export const COOKIES = {
     ACCESS_TOKEN: 'acctoken',
-    REFRESH_TOKEN:'refresh_token',
+    REFRESH_TOKEN: 'refresh_token',
+}
+
+export const VERIFICATION_SCENARIO = {
+    PASSWORD_RESET: "password-reset",
+    FORM_SIGNUP: "form-signup",
+    SOCIAL_SIGNUP: "social-signup",
+}
+
+export const HEADER = {
+    AUTHORIZATION: 'Authorization',
 }
