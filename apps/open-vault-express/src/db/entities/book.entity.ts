@@ -3,10 +3,6 @@ import { SocialLoginProvider } from "./social-login-provider.entity";
 import { Otp } from "./otp.entity";
 import { User } from "./user.entity";
 
-export enum UserRole {
-    user,
-    superUser,
-}
 
 @Entity()
 export class Book {

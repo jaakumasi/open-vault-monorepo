@@ -1,0 +1,76 @@
+<div>
+    <h2 class="text-center my-4 text-3xl">Open Vault</h2>
+
+    <p class="text-center mb-12">Safeguard Knowledge, Share with All.</p>
+
+    <form [formGroup]="signinForm">
+        <div class="flex w-full flex-col-reverse xl:grid xl:grid-cols-7">
+            <div class="col-span-3 xl:my-auto xl:items-center"> 
+                <app-google-auth (credentialEmitter)="onSignin($event, true)" />
+            </div>
+
+            <app-form-divider />
+
+            <div class="col-span-3">
+                <!--email-->
+                <app-form-control 
+                    formControlName="email"
+                    type="text" 
+                    iconPath="assets/images/mail.svg"
+                    placeholder="Email"
+                    [invalidInput]="emailRequired! || emailPatternInvalid! || showHttpErrorResponse()"
+                />
+
+                <!--invalid email message-->
+                <app-invalid-input-message
+                    [message]="emailRequired ? 'required': 
+                               emailPatternInvalid ? 'enter a valid email': 
+                               showHttpErrorResponse() ? httpErrorMessage(): ''"
+                />
+
+                <!--password-->
+                <app-form-control 
+                    formControlName="password"
+                    type="password" 
+                    iconPath="assets/images/password.svg"
+                    placeholder="Password"
+                    [invalidInput]="passwordRequired! || showHttpErrorResponse()"
+                />
+
+                <!--invalid password message-->
+                <app-invalid-input-message [message]="passwordRequired ? 'required': ''" />
+
+                <!--forgot password-->
+                <div 
+                    class="for w-fit ml-auto text-accent hover:cursor-pointer" 
+                    routerLink="/auth/request-otp">
+                    Forgot password?
+                </div>
+
+                <!--space-->
+                <div class="w-full h-1"></div>
+
+                <!--sign in button-->
+                <app-action-btn 
+                    btnText="Sign in" 
+                    (clickEventEmitter)="onSignin(null)" 
+                    [isEnabled]="isSubmitEnabled()"
+                    [isLoading]="isMakingRequest()"
+                />
+
+                <!--space-->
+                <div class="w-full h-1"></div>
+                
+                <!--go to signup-->
+                <div class="text-center">
+                    New here? 
+                    <span 
+                        class="text-accent hover:cursor-pointer" 
+                        routerLink="/auth/signup">
+                        Create an account
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

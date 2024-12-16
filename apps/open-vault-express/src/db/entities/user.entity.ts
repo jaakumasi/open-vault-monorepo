@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { SocialLoginProvider } from "./social-login-provider.entity";
 import { Otp } from "./otp.entity";
-import { Book, UserRole } from "./book.entity";
+import { Book } from "./book.entity";
+import { UserRole } from "../../shared/types";
 
 @Entity()
 export class User {

@@ -1,0 +1,4 @@
+.is_disabled {
+    background-color:  #C3D2CB;
+    cursor: not-allowed;
+}

@@ -1,0 +1,13 @@
+<div 
+    class="relative w-full text-center p-[0.7rem] bg-active-btn border-solid border-black border-[2px] rounded-md hover:bg-accent transition-colors hover:cursor-pointer"
+    [ngClass]="{'is_disabled': !isEnabled}"
+    (click)="onClick()">
+    {{btnText}}
+    @if (isLoading) {
+        <img 
+            src="./assets/images/loading.gif" 
+            alt="loading"
+            class="absolute top-[50%] -translate-y-[50%] left-6 w-6"
+        />
+    }
+</div>
