@@ -1,14 +1,10 @@
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import "reflect-metadata";
-import { env } from './config/env';
 import authRouter from './controllers/auth.controller';
 import bookRouter from './controllers/book.controller.';
 import dataSource from './db/data-source';
-import { verifyJWT } from './middlewares/auth';
-import { S3Service } from './services/s3.service';
 import { logger } from './shared/utils/logger.util';
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -37,10 +33,6 @@ dataSource.initialize().then(() => {
 app.use('/api/v1/auth', authRouter);
 
 app.use('/api/v1/books', bookRouter);
-
-/* JWT Auth middleware for routes requiring authorization */
-app.use(verifyJWT)
-
 
 
 app.listen(port, () => {
