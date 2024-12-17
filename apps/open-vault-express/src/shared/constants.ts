@@ -82,6 +82,6 @@ export const VERIFICATION_SCENARIO = {
     SOCIAL_SIGNUP: "social-signup",
 }
 
-export const HEADER = {
+export const REQUEST_HEADERS = {
     AUTHORIZATION: 'Authorization',
 }

@@ -119,14 +119,14 @@ const handleFormSignin = async (res: Response, userDto: UserAuthDto, user: User)
 }
 
 const handleValidSigninRequest = async (res: Response, user: User) => {
-    const { password: _, ...userMinusPassword } = user;
+    delete user.password
 
     res.status(STATUS_CODES.OK).json({
         statusCode: STATUS_CODES.OK,
         message: SUCCESSFUL_REQUEST.SIGNIN_SUCCESS,
         data: {
-            token: await getAuthToken({ email: userMinusPassword.email }),
-            user: userMinusPassword,
+            token: await getAuthToken({ email: user.email }),
+            user,
             redirectTo: REDIRECT_TO.HOME,
         },
     } as ResponseObject)
@@ -260,7 +260,7 @@ export const handlePasswordResetRequest = async (req: Request, res: Response, ne
                 statusCode: STATUS_CODES.BAD_REQUEST,
                 message: BAD_REQUEST.UNVERIFIED_OTP,
             } as ResponseObject)
-        } 
+        }
 
         const newHashedPassword = await hash(
             password,
