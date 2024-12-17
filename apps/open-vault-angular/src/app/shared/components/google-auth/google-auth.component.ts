@@ -1,6 +1,7 @@
 declare var google: any;
 
-import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { GoogleUser } from '../../types';
 
 @Component({
   selector: 'app-google-auth',
@@ -9,7 +10,7 @@ import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
   templateUrl: './google-auth.component.html',
 })
 export class GoogleAuthComponent implements OnInit {
-  @Output() credentialEmitter = new EventEmitter<any>();
+  @Output() credentialEmitter = new EventEmitter<GoogleUser>();
 
   ngOnInit(): void {
     this.gInit();
@@ -19,9 +20,14 @@ export class GoogleAuthComponent implements OnInit {
     google?.accounts.id.initialize({
       client_id:
         '190199373473-dld4tnh6187uhdt7vrfers6ld7ofbdgi.apps.googleusercontent.com',
-      callback: (data: any) => {
-        this.credentialEmitter.emit(data);
-      },
+      callback: (credentials: {
+        credential: string;
+        client_id: string;
+      }) => {
+        const payload = credentials.credential.split('.')[1];
+        const decodedCredentials: GoogleUser = JSON.parse(atob(payload));
+        this.credentialEmitter.emit(decodedCredentials);
+      }
     });
     google?.accounts.id.renderButton(document.querySelector('.google-btn_'), {
       type: 'icon',

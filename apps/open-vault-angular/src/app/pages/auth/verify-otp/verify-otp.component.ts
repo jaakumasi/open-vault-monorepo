@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageDisplayComponent } from "../../../shared/components/message-display/message-display.component";
 import { REDIRECTION_TIMEOUT, STORAGE_KEYS, VERIFICATION_SCENARIO } from '../../../shared/constants';
-import { ResponseObject } from '../../../shared/types';
+import { RedirectionResponseData, ResponseObject } from '../../../shared/types';
 import { AuthApiService } from '../shared/services/auth-api.service';
 import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
 
@@ -37,7 +37,7 @@ export class VerifyOtpComponent implements OnInit {
   errorResponse = signal('');
   requestOtpWaitTime = signal(60);
   formattedWaitTime = signal('00:00');
-  intervalRef!: any;
+  intervalRef!: ReturnType<typeof setInterval>;
 
   otpInput1 = '';
   otpInput2 = '';
@@ -59,6 +59,7 @@ export class VerifyOtpComponent implements OnInit {
   onOtpChange(value: string, ref: HTMLInputElement | null) {
     /* ignore otp input changes if OTP verification is ongoing */
     if (this.isVerifying()) return;
+
     /* submit if all fields have numeric inputs */
     if (
       this.inputRegex.test(this.otpInput1) &&
@@ -69,6 +70,7 @@ export class VerifyOtpComponent implements OnInit {
       this.onSubmit();
       return;
     }
+
     /* move focus to next otp field if the current input is a number */
     const matches = this.inputRegex.test(value);
     if (matches && ref) ref.focus();
@@ -79,26 +81,31 @@ export class VerifyOtpComponent implements OnInit {
 
     const otp =
       this.otpInput1 + this.otpInput2 + this.otpInput3 + this.otpInput4;
+
     const requestBody = {
       otp,
-      email: this.getEmail(),
+      email: this.getEmail()!,
       verificationScenario: this.getVerificationScenario(),
     };
+
     this.authApiService.handleOtpVerification(requestBody).subscribe({
-      next: (response: any) => this.handleSuccessResponse(response),
+      next: (response) => this.handleSuccessResponse(response),
       error: (response: HttpErrorResponse) =>
         this.handleErrorResponse(response),
     });
   }
 
-  handleSuccessResponse(response: ResponseObject) {
+  handleSuccessResponse(_response: object) {
     this.onRequestEnd();
+
+    const response = _response as ResponseObject
+
     this.isOtpInvalid.set(false);
     clearInterval(this.intervalRef);
     this.allowResend.set(false);
     this.isVerificationComplete.set(true);
 
-    const redirectTo = response.data?.redirectTo!;
+    const {redirectTo} = response.data as RedirectionResponseData
 
     setTimeout(async () => {
       await this.router.navigateByUrl(redirectTo);
@@ -143,14 +150,10 @@ export class VerifyOtpComponent implements OnInit {
       email: this.getEmail()!,
     };
     this.authApiService.handleOtpRequest(requestBody).subscribe({
-      next: (response: any) => {
-        console.log(response);
+      next: () => {
         this.requestOtpWaitTime.set(60);
         this.countdownTimer();
       },
-      // error: (response: HttpErrorResponse) => {
-      //   console.log(response);
-      // },
     });
   }
 

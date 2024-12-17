@@ -17,7 +17,7 @@ import { InvalidInputMessageComponent } from "../../../shared/components/invalid
 import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
 import { CLIENT_ENDPOINTS, STORAGE_KEYS } from '../../../shared/constants';
 import { updateUser } from '../../../shared/store/actions.store';
-import { FormSignupRequest, GoogleUser, ResponseObject, SocialSignupRequest, User } from '../../../shared/types';
+import { FormSignupRequest, GoogleUser, NonRedirectionResponseData, ResponseObject, SocialSignupRequest, User } from '../../../shared/types';
 import { emailValidator } from '../../../shared/validators/email.validator';
 import { AuthApiService } from '../shared/services/auth-api.service';
 
@@ -34,7 +34,7 @@ import { AuthApiService } from '../shared/services/auth-api.service';
     InvalidInputMessageComponent,
     RouterLink,
     OpenVaultBannerComponent
-],
+  ],
   templateUrl: './signin.component.html',
 })
 export class SigninComponent implements OnInit {
@@ -73,25 +73,23 @@ export class SigninComponent implements OnInit {
   }
 
   onSignin(
-    encodedUserCredentials: { credential: string; client_id: string } | null,
+    decodedUser: GoogleUser | null,
     isSocialSignin: boolean = false
   ) {
     this.onRequestStart();
 
-    let requestBody: SocialSignupRequest | FormSignupRequest | {} = {};
-    let decodedUser: GoogleUser;
+    let requestBody = null;
+    
     if (isSocialSignin) {
-      decodedUser = this.decodeCredentials(encodedUserCredentials!);
-      console.log(decodedUser)
       requestBody = {
-        email: decodedUser.email,
+        email: decodedUser!.email,
         isSocialLogin: true,
         socialLoginProvider: {
-          name: decodedUser.name,
-          profilePictureUrl: decodedUser.picture,
+          name: decodedUser!.name,
+          profilePictureUrl: decodedUser!.picture,
           provider: 'google',
         },
-      };
+      } as SocialSignupRequest;
     } else {
       const email = this.signinForm.get('email')?.value;
       const password = this.signinForm.get('password')?.value;
@@ -99,7 +97,7 @@ export class SigninComponent implements OnInit {
         email,
         password,
         isSocialLogin: false,
-      };
+      } as FormSignupRequest;
     }
 
     /* For users who's OTPs are unverified, the email is required during verification.
@@ -110,7 +108,7 @@ export class SigninComponent implements OnInit {
     else this.saveEmail(formEmail);
 
     this.authApiService.handleSignin(requestBody).subscribe({
-      next: (response: any) => {
+      next: (response: object) => {
         this.handleSuccessResponse(response);
       },
       error: (response: HttpErrorResponse) => {
@@ -119,13 +117,13 @@ export class SigninComponent implements OnInit {
     });
   }
 
-  async handleSuccessResponse(response: ResponseObject) {
+  async handleSuccessResponse(_response: object) {
     this.onRequestEnd();
 
+    const response = _response as ResponseObject;
     this.saveToken(response);
-
-    const redirectTo = response.data?.redirectTo;
-    this.updateStore(response.data?.user!);
+    const user = (response.data as NonRedirectionResponseData).user;
+    this.updateStore(user);
 
     await this.router.navigateByUrl(`/${CLIENT_ENDPOINTS.HOME}`);
   }
@@ -159,19 +157,11 @@ export class SigninComponent implements OnInit {
   }
 
   saveToken(response: ResponseObject) {
+    const token = (response.data as NonRedirectionResponseData).token
     globalThis.window?.localStorage.setItem(
       STORAGE_KEYS.TOKEN,
-      response.data!.token
+      token
     );
-  }
-
-
-  decodeCredentials(credentials: {
-    credential: string;
-    client_id: string;
-  }): GoogleUser {
-    const payload = credentials.credential.split('.')[1];
-    return JSON.parse(atob(payload));
   }
 
   get emailRequired() {

@@ -44,10 +44,10 @@ export class BooksListComponent {
     this.isFetchingBooks.set(false)
   }
 
-  handleFetchSuccess(response: any) {
+  handleFetchSuccess(response: object) {
     this.onRequestEnd()
 
-    const books = (response as ResponseObject).data
+    const books = (response as ResponseObject).data as Book[]
     this.books.set(books);
   }
 

@@ -13,7 +13,7 @@ import { MessageDisplayComponent } from '../../../shared/components/message-disp
 import { AuthApiService } from '../shared/services/auth-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { passwordMatch } from '../../../shared/validators/password-match.validator';
-import { PasswordReset, ResponseObject } from '../../../shared/types';
+import { PasswordResetRequest, ResponseObject } from '../../../shared/types';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CLIENT_ENDPOINTS, REDIRECTION_TIMEOUT, STORAGE_KEYS } from '../../../shared/constants';
 import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
@@ -73,16 +73,16 @@ export class PasswordResetComponent implements OnInit {
     const requestBody = {
       email: this.getEmail(),
       password: this.passwordResetForm.get('password')?.value,
-    } as PasswordReset;
+    } as PasswordResetRequest;
 
     this.authApiService.handlePasswordReset(requestBody).subscribe({
-      next: (response: any) => this.handleSuccessResponse(response),
+      next: () => this.handleSuccessResponse(),
       error: (response: HttpErrorResponse) =>
         this.handleErrorResponse(response),
     });
   }
 
-  handleSuccessResponse(response: ResponseObject) {
+  handleSuccessResponse() {
     this.onRequestEnd();
     this.showSuccessfulPasswordResetNotif.set(true);
 

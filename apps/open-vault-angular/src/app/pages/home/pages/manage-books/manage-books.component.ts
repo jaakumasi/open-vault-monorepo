@@ -74,7 +74,7 @@ export class ManageBooksComponent {
   }
 
 
-  handleUploadSuccess(response: any) {
+  handleUploadSuccess(response: object) {
     this.onRequestEnd()
     
     console.log(response)

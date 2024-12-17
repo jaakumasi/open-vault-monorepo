@@ -1,7 +1,7 @@
 export interface ResponseObject {
     statusCode: number;
     message: string;
-    data?: any;
+    data?: object;
 }
 
 export type UserRole = "user" | "superUser"

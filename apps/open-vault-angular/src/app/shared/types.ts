@@ -80,13 +80,32 @@ export interface SocialSignupRequest {
     };
 }
 
+export interface OTPVerificationRequest {
+    otp: string,
+    email: string,
+    verificationScenario: string
+}
+
+export interface OTPRequest { email: string }
 export interface ResponseObject {
     statusCode: number;
     message?: string;
-    data?: any
+    data?: RedirectionResponseData | NonRedirectionResponseData | []
 };
 
-export interface PasswordReset {
+export interface RedirectionResponseData {
+    redirectTo: string,
+    scenario: string;
+}
+
+export interface NonRedirectionResponseData {
+    user: User,
+    token: string,
+}
+
+export interface PasswordResetRequest {
     email: string;
     password: string;
 }
+
+

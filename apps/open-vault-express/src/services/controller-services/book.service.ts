@@ -21,7 +21,6 @@ const userRepo = dataSource.getRepository(User);
 const RESPONSE_MESSAGES = {
     BOOK_NOT_FOUND: 'No such book found',
     BOOK_DELETION_FAILED: 'Could not delete book',
-    FILE_UPLOAD_FAILED: '',
     NO_FILE: 'No file was uploaded',
     BOOK_DELETION_SUCCESSFUL: 'Book deleted successfully',
     ONLY_PDFS_ARE_ALLOWED: 'Only PDF files are allowed',
@@ -45,9 +44,9 @@ export const handlePostBookRequest = async (req: Request, res: Response) => {
 
     // extract book metadata
     let { totalPages, author, title } = await extractBookMetadata(fileBuffer);
-    title = fields.title[0] ?? title;
-    author = fields.author[0] ?? author
-    let description = fields.description[0] ?? 'No description'
+    title = fields.title ? fields.title[0] : title;
+    author = fields.author ? fields.author[0] : author
+    let description = fields.description ? fields.description[0] : 'No description'
 
     const userEmail = req[MIDDLEWARE_ATTACHMENTS.USER].email;
 
@@ -133,7 +132,7 @@ const uploadFiletoS3Bucket = async (file: formidable.File, fileBuffer: Buffer, r
         );
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.FILE_UPLOAD_FAILED)
+        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.UPLOAD_FAILED)
 
         return null;
     }

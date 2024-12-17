@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { REQUEST_OTP_URL, OTP_VERIFICATION_URL, SIGNIN_URL, SINGUP_URL, RESET_PASSWORD_URL } from 'apps/open-vault-angular/src/app/shared/constants';
-import { PasswordReset, ResponseObject } from 'apps/open-vault-angular/src/app/shared/types';
+import { FormSignupRequest, OTPRequest, OTPVerificationRequest, PasswordResetRequest, ResponseObject, SocialSignupRequest } from 'apps/open-vault-angular/src/app/shared/types';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,11 +10,11 @@ import { Observable } from 'rxjs';
 export class AuthApiService {
   http = inject(HttpClient);
 
-  handleSignup(body: any) {
+  handleSignup(body: FormSignupRequest) {
     return this.http.post<ResponseObject | HttpErrorResponse>(SINGUP_URL, body);
   }
 
-  handleSignin(body: any) {
+  handleSignin(body: FormSignupRequest | SocialSignupRequest) {
     return this.http.post<ResponseObject | HttpErrorResponse>(
       SIGNIN_URL,
       body
@@ -22,7 +22,7 @@ export class AuthApiService {
   }
 
   handleOtpVerification(
-    body: any
+    body: OTPVerificationRequest
   ) {
     return this.http.post<ResponseObject | HttpErrorResponse>(
       OTP_VERIFICATION_URL,
@@ -30,9 +30,7 @@ export class AuthApiService {
     );
   }
 
-  handleOtpRequest(body: {
-    email: string;
-  }) {
+  handleOtpRequest(body: OTPRequest) {
     return this.http.post<ResponseObject | HttpErrorResponse>(
       REQUEST_OTP_URL,
       body
@@ -40,7 +38,7 @@ export class AuthApiService {
   }
 
   handlePasswordReset(
-    body: PasswordReset
+    body: PasswordResetRequest
   ): Observable<HttpErrorResponse | ResponseObject> {
     return this.http.post<ResponseObject | HttpErrorResponse>(
       RESET_PASSWORD_URL,

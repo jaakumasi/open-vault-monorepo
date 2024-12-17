@@ -1,4 +1,4 @@
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -10,12 +10,12 @@ import { Router, RouterModule } from '@angular/router';
 import { ActionBtnComponent } from '../../../shared/components/action-btn/action-btn.component';
 import { FormControlComponent } from '../../../shared/components/form-control/form-control.component';
 import { InvalidInputMessageComponent } from '../../../shared/components/invalid-input-message/invalid-input-message.component';
-import { AuthApiService } from '../shared/services/auth-api.service';
+import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
+import { STORAGE_KEYS } from '../../../shared/constants';
+import { RedirectionResponseData, ResponseObject } from '../../../shared/types';
 import { emailValidator } from '../../../shared/validators/email.validator';
 import { passwordMatch } from '../../../shared/validators/password-match.validator';
-import { ResponseObject } from '../../../shared/types';
-import { CLIENT_ENDPOINTS, STORAGE_KEYS } from '../../../shared/constants';
-import { OpenVaultBannerComponent } from "../../../shared/components/open-vault-banner/open-vault-banner.component";
+import { AuthApiService } from '../shared/services/auth-api.service';
 
 @Component({
   selector: 'app-signup',
@@ -63,22 +63,22 @@ export class SignupComponent implements OnInit {
       isSocialLogin: false,
     };
     this.authApiService.handleSignup(requestBody).subscribe({
-      next: (response: any) => this.handleSuccessResponse(response),
+      next: (response: object) => this.handleSuccessResponse(response),
       error: (response: HttpErrorResponse) =>
         this.handleErrorResponse(response),
     });
   }
 
-  async handleSuccessResponse(response: ResponseObject) {
+  async handleSuccessResponse(_response: object) {
     this.isSubmitEnabled.set(false);
-    this.saveEmail();
-    this.isSignupSuccessful.set(true);
     this.isMakingRequest.set(true); // done to hide the redirect link to the signin page
 
-    const redirectTo = response.data.redirectTo;
-    const scenario = response.data.scenario;
+    const response = _response as ResponseObject;
 
-    console.log(redirectTo, scenario)
+    this.saveEmail();
+    this.isSignupSuccessful.set(true);
+
+    const {redirectTo, scenario} = (response.data as RedirectionResponseData)
 
     await this.router.navigateByUrl(`${redirectTo}/${scenario}`);
   }

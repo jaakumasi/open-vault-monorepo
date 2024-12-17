@@ -20,7 +20,7 @@ export class S3Service {
         })
     }
 
-    async uploadFile(fileBuffer: any, fileName: string, mimeType: string, directory = 'uploads') {
+    async uploadFile(fileBuffer: Buffer, fileName: string, mimeType: string, directory = 'uploads') {
         const key = this.generateKey(fileName, directory);
 
         const params = {

@@ -17,7 +17,7 @@ export class BooksApiService {
     return this.http.post(SEARCH_BOOKS_URL, body)
   }
 
-  uploadBook(book: any) {
+  uploadBook(book: FormData) {
     return this.http.post(UPLOAD_BOOK_URL, book)
   }
 }

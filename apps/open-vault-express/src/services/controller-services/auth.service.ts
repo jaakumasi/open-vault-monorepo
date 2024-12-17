@@ -338,7 +338,7 @@ export const handleVerifyOTPRequest = async (req: Request, res: Response, next: 
     })
 }
 
-const getAuthToken = async (payload: any) => {
+const getAuthToken = async (payload: object) => {
     return await signToken(
         payload,
         EXPIRY.ACCESS_TOKEN_EXPIRATION_TIME,

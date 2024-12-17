@@ -1,6 +1,6 @@
 import { sign, verify } from 'jsonwebtoken'
 
-export const signToken = async (payload: any, expiration?: string) => {
+export const signToken = async (payload: object, expiration?: string) => {
     return sign(
         payload,
         process.env.JWT_SECRET,
