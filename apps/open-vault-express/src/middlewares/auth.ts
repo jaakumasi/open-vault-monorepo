@@ -2,10 +2,9 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import { BAD_REQUEST, COOKIES, REQUEST_HEADERS, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from '../shared/constants';
+import { BAD_REQUEST, MIDDLEWARE_ATTACHMENTS, REQUEST_HEADERS, STATUS_CODES } from '../shared/constants';
 import { logger } from '../shared/utils/logger.util';
-import { ResponseObject } from '../shared/types';
-import { unauthorizedErrorResponseHandler } from '../shared/utils/response.util';
+import { errorResponseHandler } from '../shared/utils/response.util';
 
 export function validateBody<T>(type: new () => T) {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +32,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
         const token: string = req.get(REQUEST_HEADERS.AUTHORIZATION)?.split(" ")[1];
 
         if (!token)
-            return unauthorizedErrorResponseHandler(res)
+            return errorResponseHandler(res, STATUS_CODES.UNAUTHORIZED)
 
         verify(token, process.env.JWT_SECRET, (err: Error, user) => {
             if (err)
@@ -44,6 +43,6 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
         })
     } catch (error) {
         logger(error.message)
-        unauthorizedErrorResponseHandler(res, BAD_REQUEST.NO_OR_INVALID_TOKEN)
+        errorResponseHandler(res, STATUS_CODES.UNAUTHORIZED, BAD_REQUEST.NO_OR_INVALID_TOKEN)
     }
 }

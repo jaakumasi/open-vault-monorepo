@@ -1,16 +1,15 @@
 import { Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
 import dataSource from "../db/data-source";
 import { Otp } from "../db/entities/otp.entity";
 import { User } from "../db/entities/user.entity";
 import { VerifyOtpDto } from "../dtos/verify-otp.dto";
 import { BAD_REQUEST, EXPIRY, STATUS_CODES, SUCCESSFUL_REQUEST } from "../shared/constants";
+import { ResponseObject } from "../shared/types";
 import { logger } from "../shared/utils/logger.util";
 import { signToken, verifyToken } from "../shared/utils/token.util";
-import { sendMail } from "./mail.service";
 import { findUserByEmail } from "./controller-services/auth.service";
-import { ResponseObject } from "../shared/types";
-import { internalServerErrorResponseHandler } from "../shared/utils/response.util";
-import { JwtPayload } from "jsonwebtoken";
+import { sendMail } from "./mail.service";
 
 const otpRepo = dataSource.getRepository(Otp)
 

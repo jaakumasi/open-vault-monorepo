@@ -11,7 +11,7 @@ import { BookSearchDto } from "../../dtos/book-search.dto";
 import { BAD_REQUEST, MIDDLEWARE_ATTACHMENTS, STATUS_CODES } from "../../shared/constants";
 import { ResponseObject } from "../../shared/types";
 import { logger } from "../../shared/utils/logger.util";
-import { internalServerErrorResponseHandler } from "../../shared/utils/response.util";
+import { errorResponseHandler } from "../../shared/utils/response.util";
 import { PdfService } from "../pdf.service";
 import { S3Service } from "../s3.service";
 
@@ -85,7 +85,7 @@ export const handlePostBookRequest = async (req: Request, res: Response) => {
 
     } catch (error) {
         logger(error.message);
-        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.UPLOAD_FAILED)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGES.UPLOAD_FAILED)
     }
 }
 
@@ -132,7 +132,7 @@ const uploadFiletoS3Bucket = async (file: formidable.File, fileBuffer: Buffer, r
         );
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.UPLOAD_FAILED)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGES.UPLOAD_FAILED)
 
         return null;
     }
@@ -212,7 +212,7 @@ export const handleDeleteUploadedBookRequest = async (req: Request, res: Respons
 
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.BOOK_DELETION_FAILED)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGES.BOOK_DELETION_FAILED)
     }
 }
 
@@ -232,14 +232,12 @@ export const handleBookSearchRequest = async (req: Request, res: Response) => {
         } as ResponseObject)
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, error.message);
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR)
     }
 }
 
 const deleteFileFromS3Bucket = async (bookUrl: string, res: Response) => {
-    // const bookKey = 'uploads/1734242671431-js cheat sheet.pdf'
-
-    /* url format is https://bcuketname.region.amazonaws.com/itemKeyInBucket */
+    /* url format is https://<buketname>.<region>.amazonaws.com/<itemKeyInBucket> */
     const bookKey = bookUrl.split('.com/')[1];
 
     const params = {
@@ -259,6 +257,6 @@ const deleteFileFromS3Bucket = async (bookUrl: string, res: Response) => {
         } as ResponseObject)
     } catch (error) {
         logger(error)
-        internalServerErrorResponseHandler(res, RESPONSE_MESSAGES.BOOK_DELETION_FAILED)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR, RESPONSE_MESSAGES.BOOK_DELETION_FAILED)
     }
 }

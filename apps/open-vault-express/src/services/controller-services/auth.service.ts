@@ -1,17 +1,17 @@
-import { hash, compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { NextFunction, Request, Response } from "express";
 import dataSource from "../../db/data-source";
 import { User } from "../../db/entities/user.entity";
-import { UserAuthDto } from "../../dtos/user-auth.dto";
-import { BAD_REQUEST, EXPIRY, HASH, REDIRECT_TO, SERVER_ERRORS, STATUS_CODES, SUCCESSFUL_REQUEST, VERIFICATION_SCENARIO } from "../../shared/constants";
-import { ResponseObject, VerificationScenario } from "../../shared/types";
-import { logger } from "../../shared/utils/logger.util";
-import { internalServerErrorResponseHandler } from "../../shared/utils/response.util";
-import { createOtpRecord, findOtpByAssociatedMail, verifyOtpCode } from "../otp.service";
-import { VerifyOtpDto } from '../../dtos/verify-otp.dto';
-import { signToken } from '../../shared/utils/token.util';
 import { RequestOtpDto } from '../../dtos/request-otp.dto';
 import { ResetPasswordDto } from '../../dtos/reset-password.dto';
+import { UserAuthDto } from "../../dtos/user-auth.dto";
+import { VerifyOtpDto } from '../../dtos/verify-otp.dto';
+import { BAD_REQUEST, EXPIRY, HASH, REDIRECT_TO, STATUS_CODES, SUCCESSFUL_REQUEST, VERIFICATION_SCENARIO } from "../../shared/constants";
+import { ResponseObject, VerificationScenario } from "../../shared/types";
+import { logger } from "../../shared/utils/logger.util";
+import { errorResponseHandler } from "../../shared/utils/response.util";
+import { signToken } from '../../shared/utils/token.util';
+import { createOtpRecord, verifyOtpCode } from "../otp.service";
 
 const userRepo = dataSource.getRepository(User);
 
@@ -66,7 +66,7 @@ const handleUnverifiedOtpResponse = async (res: Response, userDto: UserAuthDto, 
         await createOtpRecord(user);
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, SERVER_ERRORS.SERVER_ERROR)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR)
     }
 
     const verificationScenario: VerificationScenario = userDto.isSocialLogin
@@ -197,7 +197,8 @@ export const handleSignupRequest = async (req: Request, res: Response, next: Nex
         } as ResponseObject)
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, error.message)
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR)
+
     }
 }
 
@@ -207,7 +208,7 @@ export const findUserByEmail = async (email: string, res: Response) => {
         return user;
     } catch (error) {
         logger(error.message)
-        internalServerErrorResponseHandler(res, error.message);
+        errorResponseHandler(res, STATUS_CODES.INTERNAL_SERVER_ERROR)
     }
 }
 

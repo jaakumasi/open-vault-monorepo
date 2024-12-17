@@ -8,10 +8,9 @@ import { STORAGE_KEYS } from '../constants';
 import { tap } from 'rxjs';
 
 export const requestInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req instanceof HttpResponse) 
-    return next(req);
+  console.log(req.body)
 
-  const token = localStorage.getItem(STORAGE_KEYS.TOKEN);  
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
   const reqClone = req.clone({
     headers: req.headers.set('Authorization', `Bearer ${token}`),
   });
