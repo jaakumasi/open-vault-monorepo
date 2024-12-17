@@ -41,7 +41,6 @@ export const handleSigninRequest = async (req: Request, res: Response, next: Nex
         if (!user.otpVerified)
             return handleUnverifiedOtpResponse(res, userDto, user);
 
-        /* Form signins with invalid passwords get bounced ❌. Valid ones go through ✅ */
         if (!userDto.isSocialLogin)
             return handleFormSignin(res, userDto, user);
 

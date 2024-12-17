@@ -2,13 +2,11 @@
     <h2 class="text-center my-1 text-2xl font-bold">Open Vault</h2>
 
     <div class="flex gap-3">
-        <!-- @if (showManageBooksButton()) { -->
-            <app-action-btn
-                btnText="Manage Books"
-                size="small"
-                (clickEventEmitter)="onManageBooks()"
-            />
-        <!-- } -->
+        <app-action-btn
+            [btnText]="isBooksManagementPageActive() ? 'Go back': 'Manage books'"
+            size="small"
+            (clickEventEmitter)="onNavigateToBooksPage()"
+        />
 
         <app-action-btn
             btnType="warning"
