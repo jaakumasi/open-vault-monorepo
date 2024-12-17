@@ -8,6 +8,7 @@ import { ActionBtnComponent } from "../../../../shared/components/action-btn/act
 import { FormControlComponent } from "../../../../shared/components/form-control/form-control.component";
 import { SpaceComponent } from "../../../../shared/components/space/space.component";
 import { BooksApiService } from '../../services/books-api.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-manage-books',
@@ -53,7 +54,7 @@ export class ManageBooksComponent {
       .pipe(take(1))
       .subscribe({
         next: () => this.handleUploadSuccess(),
-        error: () => this.handleUploadError()
+        error: (error) => this.handleUploadError(error)
       })
   }
 
@@ -78,12 +79,12 @@ export class ManageBooksComponent {
     })
   }
 
-  handleUploadError() {
+  handleUploadError(error: HttpErrorResponse) {
     this.onRequestEnd();
 
     this.toastService.updateToastState({
       showToast: true,
-      toastMessage: TOAST_MESSAGES.UPLOAD_FAILURE,
+      toastMessage: error.error.message ?? TOAST_MESSAGES.UPLOAD_FAILURE,
       toastVariant: 'error'
     })
   }
