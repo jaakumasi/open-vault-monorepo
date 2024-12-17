@@ -4,8 +4,6 @@
     <p>Fill the form or optionally leave fields blank for metadata extraction. </p>
     <p class="mb-2">A file must be uploaded though.</p>
 
-    <p class="mb-2">{{uploadFeedbackMessage()}}</p>
-
     <form (ngSubmit)="onSubmit()">
         <input 
             type="text" 
@@ -41,7 +39,7 @@
 
         <div class="lg:w-[50%]">
             <app-action-btn 
-                [isEnabled]="!!selectedFile"
+                [isEnabled]="!isUploadingBook() && !!selectedFile"
                 btnText="Upload"
                 [isLoading]="isUploadingBook()"
                 (clickEventEmitter)="onSubmit()"

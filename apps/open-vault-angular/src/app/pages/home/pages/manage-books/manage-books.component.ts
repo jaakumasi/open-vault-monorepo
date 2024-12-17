@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TOAST_MESSAGES } from 'apps/open-vault-angular/src/app/shared/constants';
+import { ToastService } from 'apps/open-vault-angular/src/app/shared/services/toast/toast.service';
+import { take } from 'rxjs';
 import { ActionBtnComponent } from "../../../../shared/components/action-btn/action-btn.component";
 import { FormControlComponent } from "../../../../shared/components/form-control/form-control.component";
 import { SpaceComponent } from "../../../../shared/components/space/space.component";
 import { BooksApiService } from '../../services/books-api.service';
-import { take } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-manage-books',
@@ -17,9 +18,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class ManageBooksComponent {
   booksApiService = inject(BooksApiService)
+  toastService = inject(ToastService)
 
   isUploadingBook = signal(false);
-  uploadFeedbackMessage = signal('');
 
   formData = {
     title: '',
@@ -51,22 +52,13 @@ export class ManageBooksComponent {
     this.booksApiService.uploadBook(formData)
       .pipe(take(1))
       .subscribe({
-        next: (response) => this.handleUploadSuccess(response),
+        next: () => this.handleUploadSuccess(),
         error: () => this.handleUploadError()
-    })
-
-    // Reset form data after submission
-    this.formData = {
-      title: '',
-      author: '',
-      description: ''
-    };
-    this.selectedFile = null;
+      })
   }
 
   onRequestStart() {
     this.isUploadingBook.set(true);
-    this.uploadFeedbackMessage.set('');
   }
 
   onRequestEnd() {
@@ -74,16 +66,36 @@ export class ManageBooksComponent {
   }
 
 
-  handleUploadSuccess(response: object) {
+  handleUploadSuccess() {
     this.onRequestEnd()
-    
-    console.log(response)
+
+    this.resetUploadForm();
+
+    this.toastService.updateToastState({
+      showToast: true,
+      toastMessage: TOAST_MESSAGES.UPLOAD_SUCESSS,
+      toastVariant: 'success'
+    })
   }
 
   handleUploadError() {
     this.onRequestEnd();
 
-    this.uploadFeedbackMessage.set('Upload failed.')
+    this.toastService.updateToastState({
+      showToast: true,
+      toastMessage: TOAST_MESSAGES.UPLOAD_FAILURE,
+      toastVariant: 'error'
+    })
+  }
+
+  resetUploadForm() {
+    this.formData = {
+      title: '',
+      author: '',
+      description: ''
+    };
+
+    this.selectedFile = null;
   }
 }
 

@@ -21,6 +21,11 @@ export const REDIRECTION_TIMEOUT = 2000;
 
 export const DEFAULT_TOAST_TIMEOUT = 3000;
 
+export const TOAST_MESSAGES = {
+    UPLOAD_SUCESSS: 'Book uploaded sucessfully',
+    UPLOAD_FAILURE: 'Failed to upload book'
+}
+
 /* Client Endpoints */
 export const CLIENT_ENDPOINTS = {
     /* Auth */
