@@ -20,7 +20,9 @@ export class SearchComponent {
     clearTimeout(this.debounceTimer)
 
     this.debounceTimer = setTimeout(() => {
-      this.queryEmitter.emit(query)
+      const sanitizedQuery = query.trim()
+      if (sanitizedQuery)
+        this.queryEmitter.emit(sanitizedQuery)
     }, 500);
   }
 

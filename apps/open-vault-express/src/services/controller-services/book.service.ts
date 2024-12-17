@@ -44,11 +44,11 @@ export const handlePostBookRequest = async (req: Request, res: Response) => {
 
     // extract book metadata
     let { totalPages, author, title } = await extractBookMetadata(fileBuffer);
-    title = fields.title ? fields.title[0] : title;
-    author = fields.author ? fields.author[0] : author
-    let description = fields.description ? fields.description[0] : 'No description'
+    title = fields.title?.[0] || title;
+    author = fields.author?.[0] || author
+    let description = fields.description?.[0] || 'No description'
 
-    const userEmail = req[MIDDLEWARE_ATTACHMENTS.USER].email;
+    const userEmail: string = req[MIDDLEWARE_ATTACHMENTS.USER].email;
 
     try {
         const user = await userRepo.findOne({ where: { email: userEmail } })
@@ -143,20 +143,22 @@ const uploadFiletoS3Bucket = async (file: formidable.File, fileBuffer: Buffer, r
 const extractBookMetadata = async (fileBuffer: Buffer) => {
     const pdfService = new PdfService();
 
+    const defaultResponse = {
+        totalPages: 'Unknown page count',
+        title: 'Unknown Title',
+        author: 'Unknown Author'
+    };
+
     try {
         const { totalPages, author, title } = await pdfService.extractPdfInfo(fileBuffer);
 
         return {
-            totalPages: totalPages.toString(),
-            title,
-            author
+            totalPages: totalPages.toString() || defaultResponse.totalPages,
+            title: title || defaultResponse.title,
+            author: author || defaultResponse.author
         }
     } catch (error) {
-        return {
-            totalPages: 'Unknown page count',
-            title: 'Unknown Title',
-            author: 'Unknown Author'
-        };
+        return defaultResponse
     }
 }
 
